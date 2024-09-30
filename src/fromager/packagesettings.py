@@ -608,8 +608,15 @@ class PackageBuildInfo:
         # configure max jobs settings, settings depend on package, available
         # CPU cores, and available virtual memory.
         jobs = self.parallel_jobs()
+
+        templatemakeflags = template_env.get('MAKEFLAGS', '')
+        if templatemakeflags == "":
+            makeflags = f"-j{jobs}"
+        else:
+            makeflags = f"{templatemakeflags} -j{jobs}"
+
         extra_environ: dict[str, str] = {
-            "MAKEFLAGS": f"{template_env.get('MAKEFLAGS', '')} -j{jobs}",
+            "MAKEFLAGS": f"{makeflags}",
             "CMAKE_BUILD_PARALLEL_LEVEL": str(jobs),
             "MAX_JOBS": str(jobs),
         }
